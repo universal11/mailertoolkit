@@ -1,0 +1,166 @@
+#!/usr/bin/env node
+var Program = require("commander");
+var FileSystem = require("fs");
+var TemplateBuilder = require("./classes/TemplateBuilder.js");
+var ListDispenser = require("./classes/ListDispenser.js");
+
+var MASTER_TEMPLATE_TO_CLONE = "MASTER_TEMPLATE_TO_CLONE";
+var CAMPAIGNS_DIRECTORY = "campaigns";
+//var CAMPAIGNS_DIRECTORY = "/home/mmartinez/scripts/campaigns";
+
+function additionalHelp(){
+	console.log("Additional help...");
+}
+
+function parseLists(data){
+	var listMap = data.split(",");
+
+}
+
+function prepareOOLBatchCommand(){
+	var command = "";
+	return command;
+}
+
+Program
+	.version("1.0.0")
+	//.option("-o, --output_path <path>", "Output Path")
+	//.option("-i, --input_path <path>", "Input Path")
+	
+
+Program
+	.command("send")
+	.description("Sends a batch from pool")
+	.option("-d, --email_domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
+	.option("-p, --pool <name>", "Pool name. Example: harvest, prime, etc")
+	.option("-f, --from_domain <value>", "From Domain: mariolovesmushrooms.com, google.com, etc")
+	.action(function(options){
+		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.email_domain + "/" + options.campaign + "/templates";
+		var templateFile = campaignTemplateDirectory + "/send-" + new Date().getTime();
+		FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
+			FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
+				if(error){
+					console.log(error);
+				}
+				console.log("Generated template: " + templateFile);
+
+			});
+		});
+		
+
+		
+		switch(options.email_domain){
+			case "optonline":
+				break;
+		}
+		//ListDispenser.dispense(inputPath, options.output_path, options.count);
+		//FileSystem.readdir();
+	});
+
+Program
+	.command("edit")
+	.description("Edit campaign template:")
+	.option("-d, --email_domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
+	.action(function(options){
+		console.log("Edit Template:");
+		console.log(CAMPAIGNS_DIRECTORY + "/" + options.email_domain + "/" + options.campaign + "/templates/master");
+		//ListDispenser.dispense(inputPath, options.output_path, options.count);
+	});
+
+Program
+	.command("load-list-pool")
+	.description("Load campaign lists")
+	.option("-d, --email_domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
+	.option("-p, --pool <name>", "Pool name. Example: harvest, prime, etc")
+	.option("-l, --cids <name:id>", "Lists with ID. Example: LIST1:1234,LIST2:5678,4567:LIST3", parseLists)
+	.action(function(env, options){
+		var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.email_domain + "/" + options.campaign + "/" + options.pool;
+		FileSystem.exists(poolDirectory, function(exists){
+			if(!exists){
+				FileSystem.mkdir(poolDirectory, function(error){
+					if(error){
+						console.log(error);
+					}
+				});
+			}
+
+
+
+		});
+		//ListDispenser.dispense(inputPath, options.output_path, options.count);
+	});
+
+
+Program
+	.command("create")
+	.description("Deploys a new campaign for a specified domain.")
+	.option("-d, --email_domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
+	.option("-t, --template <path>", "Template that will be used to clone from")
+	.action(function(options){
+		//ListDispenser.dispense(inputPath, options.output_path, options.count);
+		console.log("Creating...");
+		console.log("Domain:" + options.email_domain);
+		console.log("Campaign: " + options.campaign);
+		console.log("using Template: " + options.template);
+
+		FileSystem.readFile(options.template, function(error, data){
+			console.log("Loaded: " + options.template);
+			if(!error){
+				var campaignDomainDirectory = CAMPAIGNS_DIRECTORY + "/" + options.email_domain;
+
+				FileSystem.mkdir(campaignDomainDirectory, function(error){
+					if(error){
+						console.log(error);
+					}
+
+					var campaignDirectory = campaignDomainDirectory + "/" + options.campaign;
+					FileSystem.mkdir(campaignDirectory, function(error){
+						if(error){
+							console.log(error);
+						}
+						else{
+							console.log("Created: " + campaignDirectory);
+						}
+
+						var campaignMasterTemplateDirectory = campaignDirectory + "/templates";
+						FileSystem.mkdir(campaignMasterTemplateDirectory, function(event){
+							if(error){
+								console.log(error);
+							}
+							else{
+								console.log("Created: " + campaignMasterTemplateDirectory);
+							}
+						});
+
+						FileSystem.writeFile(campaignMasterTemplateDirectory + "/master", data, function(error){
+								if(error){
+									console.log(error);
+								}
+								
+								console.log("Complete.");
+								console.log("Edit Campaign Template: " + campaignMasterTemplateDirectory + "/master");
+							});
+					});
+				});
+
+				
+			}
+
+		});
+		
+	});
+
+Program
+	.command("*")
+	.description("Runs main")
+	.action(function(env, data){
+
+	});
+
+Program.on("--help", additionalHelp);
+
+Program.parse(process.argv);

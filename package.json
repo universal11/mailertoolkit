@@ -1,0 +1,9 @@
+{
+	"name":"mailertoolkit",
+	"description":"Stuff for mailing",
+	"version":"1.33.7",
+	"private":true,
+	"dependencies":{
+		"commander":"latest"
+	}
+}
