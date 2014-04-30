@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+var Program = require("commander");
+var FileSystem = require("fs");
+
+var MASTER_TEMPLATE_TO_CLONE = "MASTER_TEMPLATE_TO_CLONE";
+var CAMPAIGNS_DIRECTORY = "campaigns";
+
+function additionalHelp(){
+	console.log("Additional help...");
+}
+
+Program
+	.version("1.0.0")
+	//.option("-o, --output_path <path>", "Output Path")
+	//.option("-i, --input_path <path>", "Input Path")
+	
+
+Program
+	.command("send [path]")
+	.description("Retrieves records in batched amounts from a directory containing lists.")
+	.option("-domain, --domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
+	//.option("-i, --input_path <path>", "Input Path")
+	.action(function(inputPath, options){
+		//ListDispenser.dispense(inputPath, options.output_path, options.count);
+	});
+
+Program
+	.command("create [path]")
+	.description("Deploys a new campaign for a specified domain.")
+	.option("-domain, --domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
+	//.option("-i, --input_path <path>", "Input Path")
+	.action(function(inputPath, options){
+		//ListDispenser.dispense(inputPath, options.output_path, options.count);
+		FileSystem,readFile(MASTER_TEMPLATE_TO_CLONE, function(error, data){
+			if(error){
+				console.log(error);
+				var campaignDirectory = CAMPAIGNS_DIRECTORY + "/" + options.domain + "/" + options.campaign;
+				FileSystem.mkdir(campaignDirectory, function(error){
+					if(error){
+						console.log(error);
+						return 1;
+					}
+
+					var campaignMasterTemplateDirectory = campaignDirectory + "/master";
+					FileSystem.mkdir(campaignMasterTemplateDirectory, function(event){
+						if(error){
+							console.log(error);
+							return 1;
+						}
+					});
+
+					FileSystem.readFile(MASTER_TEMPLATE_TO_CLONE, function(error, data){
+						FileSystem.writeFile(campaignMasterTemplateDirectory + "/" + MASTER_TEMPLATE_TO_CLONE, data, function(error){
+							if(error){
+								console.log(error);
+								return 1;
+							}
+							console.log("Domain:" + options.domain);
+							console.log("Campaign: " + options.campaign);
+							console.log("Complete.");
+							console.log("Edit Campaign Template: " + campaignMasterTemplateDirectory + "/" + MASTER_TEMPLATE_TO_CLONE);
+						});
+					});
+
+					
+
+
+				});
+			}
+		});
+		
+	});
+
+Program
+	.command("*")
+	.description("Runs main")
+	.action(function(){
+
+	});
+
+Program.on("--help", additionalHelp);
+
+Program.parse(process.argv);

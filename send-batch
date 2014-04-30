@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+
+function sendBatchCommand(batchDirectory){
+	var Process = require("child_process").exec;
+
+	var batchCommand = "sudo /opt/feeder/bin/ybiz-batch.pl /home/mmartinez/templates/optonline/bloodpressure/OOL-bloodpressure-20140427 -q ool.queue -c /etc/pmta/yrly-250-OOL-MARC-PART-1 -m 100 -a 100 -v 0 -r 60 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids 88020,88021,88022,88023,88024,88025,88026,88027,87980,87981,87982,87983,87984,87985,87986,87987,87988,87989,87990,87991,87992,87993,87994,87995,87996,87997,87998,87999,88000,88001,88002,88003,88004,88005,88006,88007,88008,88009,88010,88011,88012,88013,88014,88015,88016,88017,88018,88019,88028,88029,88030,88031,88032,88033,88034,88035 -auto " + batchDirectory + "/IC-P0 " + batchDirectory + "/IC-P1 " + batchDirectory + "/IC-P2 " + batchDirectory + "/IC-P3 " + batchDirectory + "/IC-P4 " + batchDirectory + "/IC-P5 " + batchDirectory + "/IC-P6 " + batchDirectory + "/IC-P7 " + batchDirectory + "/Zayne-P0 " + batchDirectory + "/Zayne-P1 " + batchDirectory + "/Zayne-P2 " + batchDirectory + "/Zayne-P3 " + batchDirectory + "/Zayne-P4 " + batchDirectory + "/Zayne-P5 " + batchDirectory + "/Zayne-P6 " + batchDirectory + "/Zayne-P7 " + batchDirectory + "/Tazo-P0 " + batchDirectory + "/Tazo-P1 " + batchDirectory + "/Tazo-P2 " + batchDirectory + "/Tazo-P3 " + batchDirectory + "/Tazo-P4 " + batchDirectory + "/Tazo-P5 " + batchDirectory + "/Tazo-P6 " + batchDirectory + "/Tazo-P7 " + batchDirectory + "/REG-P0 " + batchDirectory + "/REG-P1 " + batchDirectory + "/REG-P2 " + batchDirectory + "/REG-P3 " + batchDirectory + "/REG-P4 " + batchDirectory + "/REG-P5 " + batchDirectory + "/REG-P6 " + batchDirectory + "/REG-P7 " + batchDirectory + "/Recess-P0 " + batchDirectory + "/Recess-P1 " + batchDirectory + "/Recess-P2 " + batchDirectory + "/Recess-P3 " + batchDirectory + "/Recess-P4 " + batchDirectory + "/Recess-P5 " + batchDirectory + "/Recess-P6 " + batchDirectory + "/Recess-P7 " + batchDirectory + "/MA-P0 " + batchDirectory + "/MA-P1 " + batchDirectory + "/MA-P2 " + batchDirectory + "/MA-P3 " + batchDirectory + "/MA-P4 " + batchDirectory + "/MA-P5 " + batchDirectory + "/MA-P6 " + batchDirectory + "/MA-P7 " + batchDirectory + "/Dirae-P0 " + batchDirectory + "/Dirae-P1 " + batchDirectory + "/Dirae-P2 " + batchDirectory + "/Dirae-P3 " + batchDirectory + "/Dirae-P4 " + batchDirectory + "/Dirae-P5 " + batchDirectory + "/Dirae-P6 " + batchDirectory + "/Dirae-P7";
+	console.log("Executing:");
+	console.log(batchCommand);
+	Process(batchCommand, function(error, data){
+		if(error){
+			console.log(error);
+		}
+		//console.log("Response:");
+		//console.log(data);
+		console.log("Complete.");
+	});
+	//console.log(batchCommand);
+}
+
+var numberOfArguments = process.argv.length;
+var batchDirectory = "";
+
+for(var i=0; i < numberOfArguments; i++){
+	var argument = process.argv[i];
+	switch(argument){
+		case "-b":
+			batchDirectory = process.argv[(i + 1)];
+			break;
+		default:
+			break;
+	}
+}
+
+if(batchDirectory != ""){
+	sendBatchCommand(batchDirectory);
+}
