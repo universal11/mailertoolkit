@@ -4,6 +4,7 @@
 	"version":"1.33.7",
 	"private":true,
 	"dependencies":{
-		"commander":"latest"
+		"commander":"latest",
+		"jsdom":"latest"
 	}
 }

@@ -22,6 +22,14 @@ function prepareOOLBatchCommand(){
 	return command;
 }
 
+
+/*
+
+ var batchCommand = "sudo /opt/feeder/bin/ybiz-batch.pl /home/mmartinez/templates/optonline/oceansbounty/OOL-oceansbounty-20140430 -q ool.queue -c /etc/pmta/yrly-250-OOL-MARC-PART-1 -m 100 -a 100 -v 0 -r 75 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids 88844,88845,88846,88829,88830,88831,88832,88833,88834,88835,88836,88837,88838,88839,88840,88841,88842,88843,88847,88848,88849 -auto " + batchDirectory + "/IC-P0 " + batchDirectory + "/IC-P2 " + batchDirectory + "/IC-P3 " + batchDirectory + "/Zayne-P0 " + batchDirectory + "/Zayne-P2 " + batchDirectory + "/Zayne-P3 " + batchDirectory + "/Tazo-P0 " + batchDirectory + "/Tazo-P2 " + batchDirectory + "/Tazo-P3 " + batchDirectory + "/REG-P0 " + batchDirectory + "/REG-P2 " + batchDirectory + "/REG-P3 " + batchDirectory + "/Recess-P0 " + batchDirectory + "/Recess-P2 " + batchDirectory + "/Recess-P3 " + batchDirectory + "/MA-P0 " + batchDirectory + "/MA-P2 " + batchDirectory + "/MA-P3 " + batchDirectory + "/Dirae-P0 " + batchDirectory + "/Dirae-P2 " + batchDirectory + "/Dirae-P3";
+
+ */
+
+
 Program
 	.version("1.0.0")
 	//.option("-o, --output_path <path>", "Output Path")
@@ -29,31 +37,88 @@ Program
 	
 
 Program
-	.command("send")
-	.description("Sends a batch from pool")
-	.option("-d, --email_domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.command("build")
+	.description("Builds a batch from pool")
+	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
 	.option("-p, --pool <name>", "Pool name. Example: harvest, prime, etc")
 	.option("-f, --from_domain <value>", "From Domain: mariolovesmushrooms.com, google.com, etc")
+	.option("-a, --account_id <value>", "Account ID")
+	.option("-r, --accounts file <value>", "Account File")
 	.action(function(options){
-		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.email_domain + "/" + options.campaign + "/templates";
-		var templateFile = campaignTemplateDirectory + "/send-" + new Date().getTime();
+		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
+		var sendTimeStamp = "/send-" + new Date().getTime();
+		var templateFile = campaignTemplateDirectory + "/send-" + sendTimeStamp;
 		FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
 			FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
 				if(error){
 					console.log(error);
 				}
 				console.log("Generated template: " + templateFile);
+				var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/" + options.pool;
+				FileSystem.readdir(poolDirectory, function(error, parts){
+					if(error){
+						console.log(error);
+					}
+					else{
+						if(parts.length > 0){
+							var poolPartDirectory = poolDirectory + "/" + parts[0];
+							var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
+
+							FileSystem.readdir(poolPartDirectory, function(error, files){
+								if(error){
+									console.log(error);
+								}
+								var batchCommand = "";
+							
+								switch(options.provider){
+									case "optonline":
+										batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c " + accountsFile + " -m 100 -a 100 -v 0 -r 75 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+										break;
+									case "roadrunner":
+										break;
+									default:
+										break;
+								}
+								console.log(batchCommand);
+
+								var process = require("child_process").exec;
+								process("rm -rf " + poolPartDirectory, function(error, output){
+									if(error){
+										console.log(error);
+									}
+									console.log(output);
+									console.log("Removed: " + poolPartDirectory);
+								});
+
+
+
+								process("/scripts/rly-cutter.sh " + options.accounts_file + " " + options.account_id + " 250 | sudo tee " + accountsFile, function(error, output){
+									if(error){
+										console.log(error);
+									}
+									console.log(output);
+									console.log("Generated accounts file.");
+						
+								});
+
+
+							});
+						}
+					}
+					
+					
+
+					
+
+				});
 
 			});
 		});
 		
 
 		
-		switch(options.email_domain){
-			case "optonline":
-				break;
-		}
+		
 		//ListDispenser.dispense(inputPath, options.output_path, options.count);
 		//FileSystem.readdir();
 	});
@@ -61,23 +126,23 @@ Program
 Program
 	.command("edit")
 	.description("Edit campaign template:")
-	.option("-d, --email_domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
 	.action(function(options){
 		console.log("Edit Template:");
-		console.log(CAMPAIGNS_DIRECTORY + "/" + options.email_domain + "/" + options.campaign + "/templates/master");
+		console.log(CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates/master");
 		//ListDispenser.dispense(inputPath, options.output_path, options.count);
 	});
 
 Program
 	.command("load-list-pool")
 	.description("Load campaign lists")
-	.option("-d, --email_domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
 	.option("-p, --pool <name>", "Pool name. Example: harvest, prime, etc")
 	.option("-l, --cids <name:id>", "Lists with ID. Example: LIST1:1234,LIST2:5678,4567:LIST3", parseLists)
 	.action(function(env, options){
-		var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.email_domain + "/" + options.campaign + "/" + options.pool;
+		var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/" + options.pool;
 		FileSystem.exists(poolDirectory, function(exists){
 			if(!exists){
 				FileSystem.mkdir(poolDirectory, function(error){
@@ -97,20 +162,20 @@ Program
 Program
 	.command("create")
 	.description("Deploys a new campaign for a specified domain.")
-	.option("-d, --email_domain <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
 	.option("-t, --template <path>", "Template that will be used to clone from")
 	.action(function(options){
 		//ListDispenser.dispense(inputPath, options.output_path, options.count);
 		console.log("Creating...");
-		console.log("Domain:" + options.email_domain);
+		console.log("Domain:" + options.provider);
 		console.log("Campaign: " + options.campaign);
 		console.log("using Template: " + options.template);
 
 		FileSystem.readFile(options.template, function(error, data){
 			console.log("Loaded: " + options.template);
 			if(!error){
-				var campaignDomainDirectory = CAMPAIGNS_DIRECTORY + "/" + options.email_domain;
+				var campaignDomainDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider;
 
 				FileSystem.mkdir(campaignDomainDirectory, function(error){
 					if(error){
