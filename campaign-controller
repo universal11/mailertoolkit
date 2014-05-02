@@ -56,50 +56,54 @@ Program
 					}
 					else{
 						if(parts.length > 0){
-							var poolPartDirectory = poolDirectory + "/" + parts[0];
-							var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
+							var partsCount - parts.length;
+							for(var i=0; i < partsCount; i++){
+								var poolPartDirectory = poolDirectory + "/" + parts[i];
+								var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
+								
+								FileSystem.readdir(poolPartDirectory, function(error, files){
+									if(error){
+										console.log(error);
+									}
+									var batchCommand = "";
+								
+									switch(options.provider){
+										case "optonline":
+											batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c /etc/pmta/yrly-250-OOL-MARC-PART-1 -m 100 -a 100 -v 0 -r 75 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+											break;
+										case "roadrunner":
+	                    					batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c /etc/pmta/yrly-250-RR-MARC-PART-1 -m 100 -a 100 -v 0 -r 75 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+											break;
+										default:
+											break;
+									}
+									console.log(batchCommand);
 
-							FileSystem.readdir(poolPartDirectory, function(error, files){
-								if(error){
-									console.log(error);
-								}
-								var batchCommand = "";
+	                				/*
+									var process = require("child_process").exec;
+									process("rm -rf " + poolPartDirectory, function(error, output){
+										if(error){
+											console.log(error);
+										}
+										console.log(output);
+										console.log("Removed: " + poolPartDirectory);
+									});
+
+	                				*/
+	                				/*
+									process("/scripts/rly-cutter.sh " + options.accounts_file + " " + options.account_id + " 250 | sudo tee " + accountsFile, function(error, output){
+										if(error){
+											console.log(error);
+										}
+										console.log(output);
+										console.log("Generated accounts file.");
 							
-								switch(options.provider){
-									case "optonline":
-										batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c /etc/pmta/yrly-250-OOL-MARC-PART-1 -m 100 -a 100 -v 0 -r 75 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
-										break;
-									case "roadrunner":
-                    batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c /etc/pmta/yrly-250-RR-MARC-PART-1 -m 100 -a 100 -v 0 -r 75 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
-										break;
-									default:
-										break;
-								}
-								console.log(batchCommand);
-
-                /*
-								var process = require("child_process").exec;
-								process("rm -rf " + poolPartDirectory, function(error, output){
-									if(error){
-										console.log(error);
-									}
-									console.log(output);
-									console.log("Removed: " + poolPartDirectory);
+									});
+	                				*/
+	                
 								});
-
-                */
-                /*
-								process("/scripts/rly-cutter.sh " + options.accounts_file + " " + options.account_id + " 250 | sudo tee " + accountsFile, function(error, output){
-									if(error){
-										console.log(error);
-									}
-									console.log(output);
-									console.log("Generated accounts file.");
-						
-								});
-                */
-                
-							});
+							}
+							
 						}
 					}
 					
