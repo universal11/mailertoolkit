@@ -5,8 +5,8 @@ var TemplateBuilder = require("./classes/TemplateBuilder.js");
 var ListDispenser = require("./classes/ListDispenser.js");
 
 var MASTER_TEMPLATE_TO_CLONE = "MASTER_TEMPLATE_TO_CLONE";
-var CAMPAIGNS_DIRECTORY = "campaigns";
-//var CAMPAIGNS_DIRECTORY = "/home/mmartinez/scripts/campaigns";
+//var CAMPAIGNS_DIRECTORY = "campaigns";
+var CAMPAIGNS_DIRECTORY = "/home/mmartinez/scripts/mailertoolkit/campaigns";
 
 function additionalHelp(){
 	console.log("Additional help...");
@@ -41,8 +41,8 @@ Program
 	.option("-r, --accounts file <value>", "Account File")
 	.action(function(options){
 		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
-		var sendTimeStamp = "/send-" + new Date().getTime();
-		var templateFile = campaignTemplateDirectory + "/send-" + sendTimeStamp;
+		var sendTimeStamp = new Date().getTime();
+		var templateFile = campaignTemplateDirectory + "/send";
 		FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
 			FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
 				if(error){
@@ -67,15 +67,17 @@ Program
 							
 								switch(options.provider){
 									case "optonline":
-										batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c " + accountsFile + " -m 100 -a 100 -v 0 -r 75 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+										batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c /etc/pmta/yrly-250-OOL-MARC-PART-1 -m 100 -a 100 -v 0 -r 75 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
 										break;
 									case "roadrunner":
+                    batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c /etc/pmta/yrly-250-RR-MARC-PART-1 -m 100 -a 100 -v 0 -r 75 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
 										break;
 									default:
 										break;
 								}
 								console.log(batchCommand);
 
+                /*
 								var process = require("child_process").exec;
 								process("rm -rf " + poolPartDirectory, function(error, output){
 									if(error){
@@ -85,8 +87,8 @@ Program
 									console.log("Removed: " + poolPartDirectory);
 								});
 
-
-
+                */
+                /*
 								process("/scripts/rly-cutter.sh " + options.accounts_file + " " + options.account_id + " 250 | sudo tee " + accountsFile, function(error, output){
 									if(error){
 										console.log(error);
@@ -95,8 +97,8 @@ Program
 									console.log("Generated accounts file.");
 						
 								});
-
-
+                */
+                
 							});
 						}
 					}
