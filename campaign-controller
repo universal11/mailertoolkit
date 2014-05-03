@@ -25,7 +25,7 @@ function prepareOOLBatchCommand(){
 
 function prepareBatchCommand(poolPart, poolDirectory){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
-	var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
+	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 
 	console.log("Reading: " + poolPartDirectory);
 	FileSystem.readdir(poolPartDirectory, function(error, files){
