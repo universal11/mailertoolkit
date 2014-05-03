@@ -63,14 +63,15 @@ Program
 						if(parts.length > 0){
 							var partsCount = parts.length;
 							for(var i=0; i < partsCount; i++){
-								
-								
+								var poolPart = parts[i];
+								var poolPartDirectory = poolDirectory + "/" + poolPart;
+								var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
+
 								FileSystem.readdir(poolPartDirectory, function(error, files){
 									if(error){
 										console.log(error);
 									}
-									var poolPartDirectory = poolDirectory + "/" + parts[i];
-									var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
+									
 									var batchCommand = "";
 								
 									switch(options.provider){
