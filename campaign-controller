@@ -86,7 +86,6 @@ Program
 	.description("Builds a batch from pool")
 	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
-	.option("-p, --pool <name>", "Pool name. Example: harvest, prime, etc")
 	.option("-f, --from_domain <value>", "From Domain: mariolovesmushrooms.com, google.com, etc")
 	.option("-a, --account_id <value>", "Account ID")
 	.option("-r, --accounts file <value>", "Account File")
@@ -100,7 +99,7 @@ Program
 					console.log(error);
 				}
 				//console.log("Generated template: " + templateFile);
-				var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/" + options.pool;
+				var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/pool";
 				FileSystem.readdir(poolDirectory, function(error, parts){
 					if(error){
 						console.log(error);
