@@ -23,7 +23,7 @@ function prepareOOLBatchCommand(){
 }
 
 
-function prepareBatchCommand(poolPart, poolDirectory, provider){
+function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 
@@ -109,7 +109,7 @@ Program
 							var partsCount = parts.length;
 							for(var i=0; i < partsCount; i++){
 								var poolPart = parts[i];
-								prepareBatchCommand(poolPart, poolDirectory, options.provider);
+								prepareBatchCommand(poolPart, poolDirectory, options.provider, templateFile);
 							}
 							
 						}
