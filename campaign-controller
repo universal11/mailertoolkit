@@ -109,7 +109,7 @@ Program
 							var partsCount = parts.length;
 							for(var i=0; i < partsCount; i++){
 								var poolPart = parts[i];
-								prepareBatchCommand(poolPart, poolDirectory, provider);
+								prepareBatchCommand(poolPart, poolDirectory, options.provider);
 							}
 							
 						}
