@@ -23,7 +23,7 @@ function prepareOOLBatchCommand(){
 }
 
 
-function prepareBatchCommand(poolPart, poolDirectory){
+function prepareBatchCommand(poolPart, poolDirectory, provider){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 
@@ -35,7 +35,7 @@ function prepareBatchCommand(poolPart, poolDirectory){
 		
 		var batchCommand = "";
 
-		switch(options.provider){
+		switch(provider){
 			case "optonline":
 				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c /etc/pmta/yrly-250-OOL-MARC-PART-1 -m 100 -a 100 -v 0 -r 90 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
 				break;
@@ -109,7 +109,7 @@ Program
 							var partsCount = parts.length;
 							for(var i=0; i < partsCount; i++){
 								var poolPart = parts[i];
-								prepareBatchCommand(poolPart, poolDirectory);
+								prepareBatchCommand(poolPart, poolDirectory, provider);
 							}
 							
 						}
