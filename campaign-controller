@@ -69,6 +69,12 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 						console.log(error);
 					}
 					console.log("Generated template: " + templateFile);
+					Process(batchCommand, function(error, output){
+						if(error){
+							console.log(error);
+						}
+						console.log(output);
+					});
 				});
 			});
 
