@@ -22,9 +22,20 @@ function parseSenderDomains(domains){
 }
 
 
-function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile, senderDomain, waitTime){
+function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplateDirectory, senderDomain, waitTime){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
+	var templateFile = campaignTemplateDirectory + "/send";
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
+
+	FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
+		FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
+			if(error){
+				console.log(error);
+			}
+			console.log("Generated template: " + templateFile);
+		});
+	});
+
 	FileSystem.readdir(poolPartDirectory, function(error, files){
 		if(error){
 			console.log(error);
@@ -96,42 +107,42 @@ Program
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
 	.action(function(options){
 		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
-		var sendTimeStamp = new Date().getTime();
-		var templateFile = campaignTemplateDirectory + "/send";
-		FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
-			FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
-				if(error){
-					console.log(error);
-				}
+		//var sendTimeStamp = new Date().getTime();
+		//var templateFile = campaignTemplateDirectory + "/send";
+		//FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
+			//FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
+				//if(error){
+					//console.log(error);
+				//}
 				//console.log("Generated template: " + templateFile);
-				var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/pool";
-				FileSystem.readdir(poolDirectory, function(error, parts){
-					if(error){
-						console.log(error);
-					}
-					else{
-						if(parts.length > 0){
-							var senderDomains = options.sender_domains;
-							var waitTime = (60000 * 10);
-							var partsCount = parts.length;
-							for(var i=0; i < partsCount; i++){
-								var poolPart = parts[i];
-								prepareBatchCommand(poolPart, poolDirectory, options.provider, templateFile, senderDomains[0], waitTime);
-								waitTime += (60000 * 10);
-								senderDomains.splice(0,1);
-							}
-							
-						}
+		var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/pool";
+		FileSystem.readdir(poolDirectory, function(error, parts){
+			if(error){
+				console.log(error);
+			}
+			else{
+				if(parts.length > 0){
+					var senderDomains = options.sender_domains;
+					var waitTime = (60000 * 10);
+					var partsCount = parts.length;
+					for(var i=0; i < partsCount; i++){
+						var poolPart = parts[i];
+						prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], waitTime);
+						waitTime += (60000 * 10);
+						senderDomains.splice(0,1);
 					}
 					
-					
+				}
+			}
+			
+			
 
-					
+			
 
-				});
-
-			});
 		});
+
+			//});
+		//});
 		
 
 		
