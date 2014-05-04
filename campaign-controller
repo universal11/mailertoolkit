@@ -231,7 +231,7 @@ Program
 	});
 
 Program
-	.command("load-pool")
+	.command("loadpool")
 	.description("Load campaign lists")
 	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
