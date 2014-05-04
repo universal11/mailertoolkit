@@ -43,10 +43,15 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile){
 			default:
 				break;
 		}
-		console.log("# # # # # # # # # # #");
-		console.log("#	Batch Command");
-		console.log("# # # # # # # # # # #");
-		console.log(batchCommand);
+
+		setTimeout(function() {
+		  	console.log("# # # # # # # # # # #");
+			console.log("#	Batch Command");
+			console.log("# # # # # # # # # # #");
+			console.log(batchCommand);
+		}, 5000);
+
+		
 
 		/*
 		var process = require("child_process").exec;
