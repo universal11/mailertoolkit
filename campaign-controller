@@ -17,13 +17,12 @@ function parseLists(data){
 
 }
 
-function prepareOOLBatchCommand(){
-	var command = "";
-	return command;
+function parseSenderDomains(domains){
+	return domains.split(",");
 }
 
 
-function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile, waitTime){
+function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile, senderDomain, waitTime){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 	FileSystem.readdir(poolPartDirectory, function(error, files){
@@ -46,7 +45,7 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile, wa
 
 		setTimeout(function() {
 		  	console.log("# # # # # # # # # # #");
-			console.log("#	Batch Command");
+			console.log("# Batch Command: Sender - " + senderDomain);
 			console.log("# # # # # # # # # # #");
 			console.log(batchCommand);
 		}, waitTime);
@@ -94,6 +93,7 @@ Program
 	.option("-f, --from_domain <value>", "From Domain: mariolovesmushrooms.com, google.com, etc")
 	.option("-a, --account_id <value>", "Account ID")
 	.option("-r, --accounts file <value>", "Account File")
+	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
 	.action(function(options){
 		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
 		var sendTimeStamp = new Date().getTime();
@@ -111,12 +111,14 @@ Program
 					}
 					else{
 						if(parts.length > 0){
+							var senderDomains = options.sender_domains;
 							var waitTime = 5000;
 							var partsCount = parts.length;
 							for(var i=0; i < partsCount; i++){
 								var poolPart = parts[i];
-								prepareBatchCommand(poolPart, poolDirectory, options.provider, templateFile, waitTime);
+								prepareBatchCommand(poolPart, poolDirectory, options.provider, templateFile, senderDomains[0], waitTime);
 								waitTime += 5000;
+								senderDomains.splice(0,1);
 							}
 							
 						}
