@@ -21,6 +21,10 @@ function parseSenderDomains(domains){
 	return domains.split(",");
 }
 
+function parseAccountIDList(accountIDList){
+	return accountIDList.split(",");
+}
+
 
 function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplateDirectory, senderDomain, accountsFile, accountId, waitTime){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
@@ -117,7 +121,7 @@ Program
 	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
 	.option("-f, --from_domain <value>", "From Domain: mariolovesmushrooms.com, google.com, etc")
-	.option("-a, --account_id <value>", "Account ID")
+	.option("-a, --account_ids <value>", "Account ID List", parseAccountIDList)
 	.option("-r, --accounts_file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes.")
@@ -140,13 +144,15 @@ Program
 			else{
 				if(parts.length > 0){
 					var senderDomains = options.sender_domains;
+					var accountIDs = options.account_ids;
 					var waitTime = (60000 * options.wait_time);
 					var partsCount = parts.length;
 					for(var i=0; i < partsCount; i++){
 						var poolPart = parts[i];
-						prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, options.account_id, waitTime);
+						prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, accountIDs[0], waitTime);
 						waitTime += (60000 * options.wait_time);
 						senderDomains.splice(0,1);
+						accountIDs.splice(0,1);
 					}
 					
 				}
