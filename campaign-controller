@@ -25,6 +25,45 @@ function parseAccountIDList(accountIDList){
 	return accountIDList.split(",");
 }
 
+function copyFileToPool(poolPath, filePath){
+	FileSystem.readFile(filePath, function(error, data){
+		if(error){
+			console.log(error);
+		}
+
+		FileSystem.writeFile(poolPath, data, function(error){
+			if(error){
+				console.log(error);
+			}
+		});
+
+	});
+}
+
+
+function loadPool(poolDirectory){
+	var poolDirectory = poolDirectory;
+	FileSystem.exists(poolDirectory, function(exists){
+		if(!exists){
+			FileSystem.mkdir(poolDirectory, function(error){
+				if(error){
+					console.log(error);
+				}
+			});
+		}
+
+		FileSystem.readdir(options.input_path, function(error, files){
+			var numberOfFiles = files.length;
+			for(var i=0; i < numberOfFiles; i++){
+				var file = files[i];
+				copyFileToPool(poolDirectory + "/" + file, options.input_path + "/" + file);
+			}
+		});
+
+
+	});
+}
+
 
 function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplateDirectory, senderDomain, accountsFile, accountId, waitTime){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
@@ -130,6 +169,7 @@ Program
 	.option("-r, --accounts_file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes.")
+	.option("-i, --input_path <value>", "Input pool path directory.")
 	.action(function(options){
 		//if(option.wait_time < 5){ option.wait_time = 5; }
 		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
@@ -191,14 +231,15 @@ Program
 	});
 
 Program
-	.command("load-list-pool")
+	.command("load-pool")
 	.description("Load campaign lists")
 	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
-	.option("-p, --pool <name>", "Pool name. Example: harvest, prime, etc")
-	.option("-l, --cids <name:id>", "Lists with ID. Example: LIST1:1234,LIST2:5678,4567:LIST3", parseLists)
+	.option("-i, --input_path <value>", "Input pool path directory.")
 	.action(function(env, options){
-		var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/" + options.pool;
+		var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/pool";
+		loadPool(poolDirectory);
+		/*
 		FileSystem.exists(poolDirectory, function(exists){
 			if(!exists){
 				FileSystem.mkdir(poolDirectory, function(error){
@@ -208,9 +249,17 @@ Program
 				});
 			}
 
+			FileSystem.readdir(options.input_path, function(error, files){
+				var numberOfFiles = files.length;
+				for(var i=0; i < numberOfFiles; i++){
+					var file = files[i];
+					copyFileToPool(poolDirectory + "/" + file, options.input_path + "/" + file);
+				}
+			});
 
 
 		});
+		*/	
 		//ListDispenser.dispense(inputPath, options.output_path, options.count);
 	});
 
