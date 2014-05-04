@@ -120,7 +120,6 @@ Program
 	.description("Builds a batch from pool")
 	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
-	.option("-f, --from_domain <value>", "From Domain: mariolovesmushrooms.com, google.com, etc")
 	.option("-a, --account_ids <value>", "Account ID List", parseAccountIDList)
 	.option("-r, --accounts_file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
