@@ -169,7 +169,6 @@ Program
 	.option("-r, --accounts_file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes.")
-	.option("-i, --input_path <value>", "Input pool path directory.")
 	.action(function(options){
 		//if(option.wait_time < 5){ option.wait_time = 5; }
 		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
@@ -235,8 +234,7 @@ Program
 	.description("Load campaign lists")
 	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
-	.option("-i, --input_path <value>", "Input pool path directory.")
-	.action(function(env, options){
+	.action(function(options){
 		var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/pool";
 		loadPool(poolDirectory);
 		/*
