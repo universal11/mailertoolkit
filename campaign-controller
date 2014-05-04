@@ -52,7 +52,7 @@ function loadPool(poolDirectory, inputPath){
 			});
 		}
 
-		FileSystem.readdir(options.input_path, function(error, files){
+		FileSystem.readdir(inputPath, function(error, files){
 			var numberOfFiles = files.length;
 			for(var i=0; i < numberOfFiles; i++){
 				var file = files[i];
