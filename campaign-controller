@@ -112,12 +112,12 @@ Program
 					else{
 						if(parts.length > 0){
 							var senderDomains = options.sender_domains;
-							var waitTime = 5000;
+							var waitTime = (60000 * 2);
 							var partsCount = parts.length;
 							for(var i=0; i < partsCount; i++){
 								var poolPart = parts[i];
 								prepareBatchCommand(poolPart, poolDirectory, options.provider, templateFile, senderDomains[0], waitTime);
-								waitTime += 5000;
+								waitTime += (60000 * 2);
 								senderDomains.splice(0,1);
 							}
 							
