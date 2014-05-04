@@ -109,7 +109,7 @@ Program
 	.option("-a, --account_id <value>", "Account ID")
 	.option("-r, --accounts file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
-	.option("-w, --wait_time <value>", "Wait time in milliseconds")
+	.option("-w, --wait_time <value>", "Wait time in minutes")
 	.action(function(options){
 		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
 		//var sendTimeStamp = new Date().getTime();
@@ -128,12 +128,12 @@ Program
 			else{
 				if(parts.length > 0){
 					var senderDomains = options.sender_domains;
-					var waitTime = (60000 * 10);
+					var waitTime = (60000 * options.wait_time);
 					var partsCount = parts.length;
 					for(var i=0; i < partsCount; i++){
 						var poolPart = parts[i];
-						prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, options.account_id, options.wait_time);
-						waitTime += (60000 * 10);
+						prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, options.account_id, waitTime);
+						waitTime += (60000 * options.wait_time);
 						senderDomains.splice(0,1);
 					}
 					
