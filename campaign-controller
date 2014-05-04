@@ -28,7 +28,7 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 
 	FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
-		FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
+		FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain), function(error){
 			if(error){
 				console.log(error);
 			}
