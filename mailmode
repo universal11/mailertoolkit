@@ -28,7 +28,7 @@ if(process.argv.length == 3){
 
 		});
 
-		Process("sudo service pmta reload", function(error, output){
+		Process("service pmta reload", function(error, output){
 			if(error){
 				console.log(error);
 			}

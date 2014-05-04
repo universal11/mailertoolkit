@@ -23,7 +23,7 @@ function prepareOOLBatchCommand(){
 }
 
 
-function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile){
+function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile, waitTime){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 	FileSystem.readdir(poolPartDirectory, function(error, files){
@@ -49,7 +49,7 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, templateFile){
 			console.log("#	Batch Command");
 			console.log("# # # # # # # # # # #");
 			console.log(batchCommand);
-		}, 5000);
+		}, waitTime);
 
 		
 
@@ -111,10 +111,12 @@ Program
 					}
 					else{
 						if(parts.length > 0){
+							var waitTime = 5000;
 							var partsCount = parts.length;
 							for(var i=0; i < partsCount; i++){
 								var poolPart = parts[i];
-								prepareBatchCommand(poolPart, poolDirectory, options.provider, templateFile);
+								prepareBatchCommand(poolPart, poolDirectory, options.provider, templateFile, waitTime);
+								waitTime += 5000;
 							}
 							
 						}
