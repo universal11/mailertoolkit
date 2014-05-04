@@ -29,14 +29,7 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 	var selectAccountsCommand = "/scripts/rly-cutter.sh " + accountsFile + " " + accountId + " 250 | sudo tee " + accountsFile;
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 
-	FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
-		FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain), function(error){
-			if(error){
-				console.log(error);
-			}
-			console.log("Generated template: " + templateFile);
-		});
-	});
+	
 
 	FileSystem.readdir(poolPartDirectory, function(error, files){
 		if(error){
@@ -57,6 +50,15 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 		}
 
 		setTimeout(function() {
+			FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
+				FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain), function(error){
+					if(error){
+						console.log(error);
+					}
+					console.log("Generated template: " + templateFile);
+				});
+			});
+
 		  	console.log("# # # # # # # # # # #");
 			console.log("# Batch Command: Sender - " + senderDomain);
 			console.log("# # # # # # # # # # #");
@@ -107,7 +109,7 @@ Program
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
 	.option("-f, --from_domain <value>", "From Domain: mariolovesmushrooms.com, google.com, etc")
 	.option("-a, --account_id <value>", "Account ID")
-	.option("-r, --accounts file <value>", "Account File")
+	.option("-r, --accounts_file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes")
 	.action(function(options){
