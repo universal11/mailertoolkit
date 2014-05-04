@@ -42,7 +42,7 @@ function copyFileToPool(poolPath, filePath){
 
 
 function loadPool(poolDirectory, inputPath){
-	var poolDirectory = poolDirectory;
+	//var poolDirectory = poolDirectory;
 	FileSystem.exists(poolDirectory, function(exists){
 		if(!exists){
 			FileSystem.mkdir(poolDirectory, function(error){
@@ -56,7 +56,30 @@ function loadPool(poolDirectory, inputPath){
 			var numberOfFiles = files.length;
 			for(var i=0; i < numberOfFiles; i++){
 				var file = files[i];
-				copyFileToPool(poolDirectory + "/" + file, inputPath + "/" + file);
+				loadPoolBatch(poolDirectory + "/" + file, inputPath + "/" + file);
+				//copyFileToPool(poolDirectory + "/" + file, inputPath + "/" + file);
+			}
+		});
+
+
+	});
+}
+
+function loadPoolBatch(batchDirectory, inputPath){
+	FileSystem.exists(batchDirectory, function(exists){
+		if(!exists){
+			FileSystem.mkdir(batchDirectory, function(error){
+				if(error){
+					console.log(error);
+				}
+			});
+		}
+
+		FileSystem.readdir(inputPath, function(error, files){
+			var numberOfFiles = files.length;
+			for(var i=0; i < numberOfFiles; i++){
+				var file = files[i];
+				copyFileToPool(batchDirectory + "/" + file, inputPath + "/" + file);
 			}
 		});
 
