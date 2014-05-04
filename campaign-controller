@@ -26,7 +26,7 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
 	var templateFile = campaignTemplateDirectory + "/send";
 
-	var selectAccountsCommand = "/scripts/rly-cutter.sh " + accountsFile + " " + accountId + " 250 | sudo tee " + accountsFile;
+	var selectAccountsCommand = "/scripts/rly-cutter.sh " + accountsFile + " " + accountId + " 250 | sudo tee /etc/pmta/marc-auto-rly";
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 
 	
@@ -40,10 +40,10 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 
 		switch(provider){
 			case "optonline":
-				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c /etc/pmta/yrly-250-OOL-MARC-PART-1 -m 100 -a 100 -v 0 -r 90 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c /etc/pmta/marc-auto-rly -m 100 -a 100 -v 0 -r 90 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
 				break;
 			case "roadrunner":
-				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c /etc/pmta/yrly-250-RR-MARC-PART-1 -m 100 -a 100 -v 0 -r 90 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c /etc/pmta/marc-auto-rly -m 100 -a 100 -v 0 -r 90 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
 				break;
 			default:
 				break;
