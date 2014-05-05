@@ -2,8 +2,8 @@
 var accountDirectory = "/home/mmartinez";
 var providerPMTAConfig = "/etc/pmta/config.d/ool-yrly.conf";
 var provider = new Array();
-provider["optonline"] = accountDirectory + "/accounts-20140429-OOL.txt";
-provider["roadrunner"] = accountDirectory + "/accounts-20140429-RR.txt";
+provider["optonline"] = accountDirectory + "/accounts-OOL";
+provider["roadrunner"] = accountDirectory + "/accounts-RR";
 
 if(process.argv.length == 3){
 	var providerConfig = provider[process.argv[2]];
