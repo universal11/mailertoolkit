@@ -87,8 +87,58 @@ function loadPoolBatch(batchDirectory, inputPath){
 	});
 }
 
+function buildSend(options, debugMode){
+	//if(option.wait_time < 5){ option.wait_time = 5; }
+	var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
+	//var sendTimeStamp = new Date().getTime();
+	//var templateFile = campaignTemplateDirectory + "/send";
+	//FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
+		//FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
+			//if(error){
+				//console.log(error);
+			//}
+			//console.log("Generated template: " + templateFile);
+	var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/pool";
+	FileSystem.readdir(poolDirectory, function(error, parts){
+		if(error){
+			console.log(error);
+		}
+		else{
+			if(parts.length > 0){
+				var senderDomains = options.sender_domains;
+				var accountIDs = options.account_ids;
+				var waitTime = (60000 * options.wait_time);
+				var partsCount = parts.length;
+				for(var i=0; i < partsCount; i++){
+					var poolPart = parts[i];
+					prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, accountIDs[0], waitTime);
+					waitTime += (60000 * options.wait_time);
+					senderDomains.splice(0,1);
+					accountIDs.splice(0,1);
+				}
+				
+			}
+		}
+		
+		
 
-function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplateDirectory, senderDomain, accountsFile, accountId, waitTime){
+		
+
+	});
+
+		//});
+	//});
+	
+
+	
+	
+	//ListDispenser.dispense(inputPath, options.output_path, options.count);
+	//FileSystem.readdir();
+}
+
+
+function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplateDirectory, senderDomain, accountsFile, accountId, waitTime, debugMode){
+	if(debugMode == undefined){ debugMode = 0; }
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
 	var currentUnixTimestamp = new Date().getTime();
 	var templateFile = campaignTemplateDirectory + "/send-" + accountId;
@@ -117,38 +167,49 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 				break;
 		}
 
-		setTimeout(function() {
-			var Process = require("child_process").exec;
+		if(!debugMode){
+			setTimeout(function() {
+				var Process = require("child_process").exec;
 
-			Process(selectAccountsCommand, function(error, output){
-				if(error){
-					console.log(error);
-				}
-				console.log(output);
-			});
-
-			FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
-				FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain), function(error){
+				Process(selectAccountsCommand, function(error, output){
 					if(error){
 						console.log(error);
 					}
-					console.log("Generated template: " + templateFile);
-					Process(batchCommand, function(error, output){
+					console.log(output);
+				});
+
+				FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
+					FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain), function(error){
 						if(error){
 							console.log(error);
 						}
-						console.log(output);
+						console.log("Generated template: " + templateFile);
+						Process(batchCommand, function(error, output){
+							if(error){
+								console.log(error);
+							}
+							console.log(output);
+						});
 					});
 				});
-			});
 
-		  	console.log("# # # # # # # # # # #");
+			  	console.log("# # # # # # # # # # #");
+				console.log("# Batch Command: Sender - " + senderDomain);
+				console.log("# # # # # # # # # # #");
+				console.log(batchCommand);
+				console.log("# Select Accounts Command:");
+				console.log(selectAccountsCommand);
+			}, waitTime);
+		}
+		else{
+			console.log("# # # # # # # # # # #");
 			console.log("# Batch Command: Sender - " + senderDomain);
 			console.log("# # # # # # # # # # #");
 			console.log(batchCommand);
 			console.log("# Select Accounts Command:");
 			console.log(selectAccountsCommand);
-		}, waitTime);
+		}
+		
 
 		
 
@@ -195,52 +256,20 @@ Program
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mails.com,google.com,china.com", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes.")
 	.action(function(options){
-		//if(option.wait_time < 5){ option.wait_time = 5; }
-		var campaignTemplateDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/templates";
-		//var sendTimeStamp = new Date().getTime();
-		//var templateFile = campaignTemplateDirectory + "/send";
-		//FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
-			//FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), options.from_domain), function(error){
-				//if(error){
-					//console.log(error);
-				//}
-				//console.log("Generated template: " + templateFile);
-		var poolDirectory = CAMPAIGNS_DIRECTORY + "/" + options.provider + "/" + options.campaign + "/pool";
-		FileSystem.readdir(poolDirectory, function(error, parts){
-			if(error){
-				console.log(error);
-			}
-			else{
-				if(parts.length > 0){
-					var senderDomains = options.sender_domains;
-					var accountIDs = options.account_ids;
-					var waitTime = (60000 * options.wait_time);
-					var partsCount = parts.length;
-					for(var i=0; i < partsCount; i++){
-						var poolPart = parts[i];
-						prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, accountIDs[0], waitTime);
-						waitTime += (60000 * options.wait_time);
-						senderDomains.splice(0,1);
-						accountIDs.splice(0,1);
-					}
-					
-				}
-			}
-			
-			
+		buildSend(options, 1);
+	});
 
-			
-
-		});
-
-			//});
-		//});
-		
-
-		
-		
-		//ListDispenser.dispense(inputPath, options.output_path, options.count);
-		//FileSystem.readdir();
+Program
+	.command("send")
+	.description("Builds a batch from pool")
+	.option("-v, --provider <value>", "Domain name. Example: verizon, hotmail, roadrunner, aol, etc")
+	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
+	.option("-a, --account_ids <value>", "Account ID List", parseAccountIDList)
+	.option("-r, --accounts_file <value>", "Account File")
+	.option("-s, --sender_domains <value>", "Sender domains. Example: mails.com,google.com,china.com", parseSenderDomains)
+	.option("-w, --wait_time <value>", "Wait time in minutes.")
+	.action(function(options){
+		buildSend(options, 0);
 	});
 
 Program

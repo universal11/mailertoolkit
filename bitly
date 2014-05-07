@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+
+var Program = require("commander");
+var ListDispenser = require("./classes/ListDispenser.js");
+
+function shorten(url){
+	var Bitly = require('bitly');
+	var bitly = new Bitly("ironman82", 'R_3a4f440da2404569a7d3cc6579abcaab');
+	bitly.shorten(url, function(err, response) {
+	  if (err) throw err;
+
+	  // See http://code.google.com/p/bitly-api/wiki/ApiDocumentation for format of returned object
+	  var shortURL = response.data.url
+
+	  // Do something with data
+
+	  console.log(shortURL);
+	});
+}
+
+function additionalHelp(){
+	console.log("Additional help...");
+}
+
+Program
+	.version("1.0.0")
+	//.option("-o, --output_path <path>", "Output Path")
+	//.option("-i, --input_path <path>", "Input Path")
+	
+
+Program
+	.command("shorten [path]")
+	.description("Shorts a URL using a random bit.ly account")
+	.action(function(path, options){
+		shorten(path);
+	});
+
+Program
+	.command("*")
+	.description("Runs main")
+	.action(function(){
+
+	});
+
+Program.on("--help", additionalHelp);
+
+Program.parse(process.argv);
