@@ -5,6 +5,7 @@
 	"private":true,
 	"dependencies":{
 		"commander":"latest",
-		"jsdom":"latest"
+		"jsdom":"latest",
+		"bitly":"latest"
 	}
 }
