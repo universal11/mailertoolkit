@@ -90,9 +90,11 @@ function loadPoolBatch(batchDirectory, inputPath){
 
 function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplateDirectory, senderDomain, accountsFile, accountId, waitTime){
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
-	var templateFile = campaignTemplateDirectory + "/send";
+	var currentUnixTimestamp = new Date().getTime();
+	var templateFile = campaignTemplateDirectory + "/send-" + accountId;
+	var generatedAccountsFile = "/etc/pmta/marc-auto-rly-" + accountId;
 
-	var selectAccountsCommand = "/scripts/rly-cutter.sh " + accountsFile + " " + accountId + " 250 | sudo tee /etc/pmta/marc-auto-rly";
+	var selectAccountsCommand = "/scripts/rly-cutter.sh " + accountsFile + " " + accountId + " 250 | sudo tee " + generatedAccountsFile;
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 
 	
@@ -106,10 +108,10 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 
 		switch(provider){
 			case "optonline":
-				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c /etc/pmta/marc-auto-rly -m 100 -a 100 -v 0 -r 90 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c " + generatedAccountsFile + " -m 50 -a 50 -v 0 -r 300 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
 				break;
 			case "roadrunner":
-				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c /etc/pmta/marc-auto-rly -m 100 -a 100 -v 0 -r 90 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c " + generatedAccountsFile + " -m 50 -a 50 -v 0 -r 300 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
 				break;
 			default:
 				break;
@@ -190,7 +192,7 @@ Program
 	.option("-c, --campaign <value>", "Campaign name. Example: oilcouponcpc, autopricefinder, etc")
 	.option("-a, --account_ids <value>", "Account ID List", parseAccountIDList)
 	.option("-r, --accounts_file <value>", "Account File")
-	.option("-s, --sender_domains <value>", "Sender domains. Example: mariolovesmushrooms.com, google.com, etc", parseSenderDomains)
+	.option("-s, --sender_domains <value>", "Sender domains. Example: mails.com,google.com,china.com", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes.")
 	.action(function(options){
 		//if(option.wait_time < 5){ option.wait_time = 5; }
