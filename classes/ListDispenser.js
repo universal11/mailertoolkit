@@ -2,8 +2,15 @@ function ListDispenser(){
 
 }
 
-ListDispenser.writeLists = function(inputData, inputPath, outputData, outputPath){
+ListDispenser.writeLists = function(inputData, inputPath, outputData, outputPath, outputDirectory){
 	var FileSystem = require("fs");
+
+	var outputPathExists = FileSystem.existsSync(outputDirectory);
+	if(!outputPathExists){
+		FileSystem.mkdirSync(outputDirectory);
+
+	}
+
 	FileSystem.writeFile(outputPath, outputData, function(error){
 		//console.log(outputPath + " written.");
 	});
@@ -52,7 +59,9 @@ ListDispenser.listHandler = function(inputPath, outputPath, file, remaining){
 	var data = FileSystem.readFileSync(inputPath + "/" + file);
 	if(data){
 		var result = ListDispenser.dispenseHandler(data, remaining);
-		ListDispenser.writeLists(result.dataLines.join("\n"), inputPath + "/" + file, result.dispenserLines.join("\n"), outputPath + "/" + file);
+		if(result.dispenserLines.length > 0){
+			ListDispenser.writeLists(result.dataLines.join("\n"), inputPath + "/" + file, result.dispenserLines.join("\n"), outputPath + "/" + file, outputPath);
+		}
 		remaining = result.remaining;	
 	}
 	return remaining;
@@ -67,10 +76,12 @@ ListDispenser.dispense = function(inputPath, outputPath, count){
 		console.log("Lists: " + files);
 		var numberOfFiles = files.length;
 
+		/*
 		var outputPathExists = FileSystem.existsSync(outputPath);
 		if(!outputPathExists){
 			FileSystem.mkdirSync(outputPath);
 		}
+		*/
 
 		for(var i=0; i < numberOfFiles; i++){
 			var file = files[i];
