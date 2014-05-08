@@ -111,7 +111,7 @@ function buildSend(options, debugMode){
 				var partsCount = parts.length;
 				for(var i=0; i < partsCount; i++){
 					var poolPart = parts[i];
-					prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, accountIDs[0], waitTime, options.bitly_domain, debugMode);
+					prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, accountIDs[0], waitTime, debugMode, options.bitly_domain);
 					waitTime += (60000 * options.wait_time);
 					senderDomains.splice(0,1);
 					accountIDs.splice(0,1);
