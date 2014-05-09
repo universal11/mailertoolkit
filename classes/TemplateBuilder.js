@@ -52,15 +52,24 @@ TemplateBuilder.create = function(FileSystem, JSDOM, name, htmlToolKit, template
 	
 }
 
-TemplateBuilder.build = function(template, domain){
+TemplateBuilder.shortenFromDomain = function(fromDomain){
+
+	return shortFromDomain;
+}
+
+TemplateBuilder.build = function(template, domain, bitlyDomain){
+	if(bitlyDomain == undefined){ bitlyDomain = ""; }
 	/*
 	' _ space.repeat(tt.number(3,12)) _ '
 	*/
 	//var domainFragments = domain.split("", 3);
 	//var shatteredDomain = 
 	//template = template.replace(new RegExp("[#domain#]", "gm"), domain);
+
 	template = template.replace(/\[\!\#domain\#\!\]/g, domain);
 	template = template.replace(/\[\!\#domain_fragments\#\!\]/g, TemplateBuilder.domainToFragments(domain));
+	template = template.replace(/\[\!\#bitly_domain\#\!\]/g, bitlyDomain);
+
 	return template;
 }
 
