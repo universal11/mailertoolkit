@@ -205,7 +205,7 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 					
 
 					FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
-						FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain, bitlyDomain), function(error){
+						FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain, shortURL), function(error){
 							if(error){
 								console.log(error);
 							}
