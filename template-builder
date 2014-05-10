@@ -28,11 +28,12 @@ Program
 	.description("Constructs template from tokens")
 	.option("-d, --sender_domain <domain>")
 	.option("-o, --output_path <path>")
+	.option("-b, --bitly_domain <path>")
 	.action(function(template, options){
 		console.log("Cloning: " + template + " for " + options.sender_domain);
 		var template = FileSystem.readFileSync(template, "utf-8");
 		console.log("Output: " + options.output_path);
-		FileSystem.writeFileSync(options.output_path, TemplateBuilder.build(template, options.sender_domain));
+		FileSystem.writeFileSync(options.output_path, TemplateBuilder.build(template, options.sender_domain, options.bitly_domain));
 		//process.exit(1);
 	});
 
