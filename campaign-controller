@@ -200,23 +200,27 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 				console.log(output);
 			});
 
+			FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
+				FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain, shortURL), function(error){
+					if(error){
+						console.log(error);
+					}
+					console.log("Generated template: " + templateFile);
+					
+				});
+			});
+
 			if(!debugMode){
 				setTimeout(function() {
 					
 
-					FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
-						FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain, shortURL), function(error){
-							if(error){
-								console.log(error);
-							}
-							console.log("Generated template: " + templateFile);
-							Process(batchCommand, function(error, output){
-								if(error){
-									console.log(error);
-								}
-								console.log(output);
-							});
-						});
+					
+
+					Process(batchCommand, function(error, output){
+						if(error){
+							console.log(error);
+						}
+						console.log(output);
 					});
 
 				  	console.log("# # # # # # # # # # #");
