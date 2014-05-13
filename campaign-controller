@@ -183,7 +183,7 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 
 		switch(provider){
 			case "optonline":
-				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c " + generatedAccountsFile + " -m 100 -a 100 -v 0 -r 120 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c " + generatedAccountsFile + " -m 100 -a 100 -v 0 -r 120 -d 2 -t jasonaccount1@optimum.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
 				break;
 			case "roadrunner":
 				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c " + generatedAccountsFile + " -m 100 -a 100 -v 0 -r 120 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
@@ -291,7 +291,6 @@ Program
 	.option("-r, --accounts_file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mails.com,google.com,china.com", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes.")
-	.option("-b, --bitly_domain <value>", "Bitly redirect domain")
 	.action(function(options){
 		buildSend(options, 1);
 	});
@@ -305,7 +304,6 @@ Program
 	.option("-r, --accounts_file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mails.com,google.com,china.com", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes.")
-	//.option("-b, --bitly_domain <value>", "Bitly redirect domain")
 	.action(function(options){
 		buildSend(options, 0);
 	});
