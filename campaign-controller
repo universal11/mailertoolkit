@@ -111,7 +111,7 @@ function buildSend(options, debugMode){
 				var partsCount = parts.length;
 				for(var i=0; i < partsCount; i++){
 					var poolPart = parts[i];
-					prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, accountIDs[0], waitTime, debugMode, options.bitly_domain);
+					prepareBatchCommand(poolPart, poolDirectory, options.provider, campaignTemplateDirectory, senderDomains[0], options.accounts_file, accountIDs[0], waitTime, debugMode);
 					waitTime += (60000 * options.wait_time);
 					senderDomains.splice(0,1);
 					accountIDs.splice(0,1);
@@ -151,7 +151,7 @@ function makeId(length){
 }
 
 
-function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplateDirectory, senderDomain, accountsFile, accountId, waitTime, debugMode, bitlyDomain){
+function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplateDirectory, senderDomain, accountsFile, accountId, waitTime, debugMode){
 	if(debugMode == undefined){ debugMode = 0; }
 	var poolPartDirectory = poolDirectory + "/" + poolPart;
 	var currentUnixTimestamp = new Date().getTime();
@@ -161,6 +161,7 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 	var selectAccountsCommand = "/scripts/rly-cutter.sh " + accountsFile + " " + accountId + " 250 | sudo tee " + generatedAccountsFile;
 	//var accountsFile = campaignTemplateDirectory + "/accounts-" + sendTimeStamp;
 
+	/*
 	var Bitly = require('bitly');
 	var bitly = new Bitly("ironman82", 'R_3a4f440da2404569a7d3cc6579abcaab');
 	bitly.shorten("http://" + bitlyDomain + "/?" + currentUnixTimestamp + makeId(10), function(err, response) {
@@ -172,101 +173,101 @@ function prepareBatchCommand(poolPart, poolDirectory, provider, campaignTemplate
 	  // Do something with data
 
 	  console.log(shortURL);
+	*/
+	 FileSystem.readdir(poolPartDirectory, function(error, files){
+		if(error){
+			console.log(error);
+		}
+		
+		var batchCommand = "";
 
-	  FileSystem.readdir(poolPartDirectory, function(error, files){
+		switch(provider){
+			case "optonline":
+				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c " + generatedAccountsFile + " -m 100 -a 100 -v 0 -r 120 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+				break;
+			case "roadrunner":
+				batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c " + generatedAccountsFile + " -m 100 -a 100 -v 0 -r 120 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
+				break;
+			default:
+				break;
+		}
+
+		var Process = require("child_process").exec;
+
+		Process(selectAccountsCommand, function(error, output){
 			if(error){
 				console.log(error);
 			}
-			
-			var batchCommand = "";
+			console.log(output);
+		});
 
-			switch(provider){
-				case "optonline":
-					batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q ool.queue -c " + generatedAccountsFile + " -m 100 -a 100 -v 0 -r 120 -d 2 -t ghostsandthings@optonline.net -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
-					break;
-				case "roadrunner":
-					batchCommand = "/opt/feeder/bin/ybiz-batch.pl " + templateFile + " -q rr.queue -c " + generatedAccountsFile + " -m 100 -a 100 -v 0 -r 120 -d 2 -t alligatoratemyac@roadrunner.com -w Y -e 4 -n 1 -sids " + files.join(",") + " -auto " + poolPartDirectory + "/" + files.join(" " + poolPartDirectory + "/");
-					break;
-				default:
-					break;
-			}
-
-			var Process = require("child_process").exec;
-
-			Process(selectAccountsCommand, function(error, output){
+		FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
+			FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain), function(error){
 				if(error){
 					console.log(error);
 				}
-				console.log(output);
+				console.log("Generated template: " + templateFile);
+				
 			});
+		});
 
-			FileSystem.readFile(campaignTemplateDirectory + "/master", function(error, data){
-				FileSystem.writeFile(templateFile, TemplateBuilder.build(data.toString(), senderDomain, shortURL), function(error){
+		if(!debugMode){
+			setTimeout(function() {
+				
+
+				
+
+				Process(batchCommand, function(error, output){
 					if(error){
 						console.log(error);
 					}
-					console.log("Generated template: " + templateFile);
-					
+					console.log(output);
 				});
-			});
 
-			if(!debugMode){
-				setTimeout(function() {
-					
-
-					
-
-					Process(batchCommand, function(error, output){
-						if(error){
-							console.log(error);
-						}
-						console.log(output);
-					});
-
-				  	console.log("# # # # # # # # # # #");
-					console.log("# Batch Command: Sender - " + senderDomain);
-					console.log("# # # # # # # # # # #");
-					console.log(batchCommand);
-					console.log("# Select Accounts Command:");
-					console.log(selectAccountsCommand);
-				}, waitTime);
-			}
-			else{
-				console.log("# # # # # # # # # # #");
+			  	console.log("# # # # # # # # # # #");
 				console.log("# Batch Command: Sender - " + senderDomain);
 				console.log("# # # # # # # # # # #");
 				console.log(batchCommand);
 				console.log("# Select Accounts Command:");
 				console.log(selectAccountsCommand);
+			}, waitTime);
+		}
+		else{
+			console.log("# # # # # # # # # # #");
+			console.log("# Batch Command: Sender - " + senderDomain);
+			console.log("# # # # # # # # # # #");
+			console.log(batchCommand);
+			console.log("# Select Accounts Command:");
+			console.log(selectAccountsCommand);
+		}
+		
+
+		
+
+		/*
+		var process = require("child_process").exec;
+		process("rm -rf " + poolPartDirectory, function(error, output){
+			if(error){
+				console.log(error);
 			}
-			
+			console.log(output);
+			console.log("Removed: " + poolPartDirectory);
+		});
 
-			
-
-			/*
-			var process = require("child_process").exec;
-			process("rm -rf " + poolPartDirectory, function(error, output){
-				if(error){
-					console.log(error);
-				}
-				console.log(output);
-				console.log("Removed: " + poolPartDirectory);
-			});
-
-			*/
-			/*
-			process("/scripts/rly-cutter.sh " + options.accounts_file + " " + options.account_id + " 250 | sudo tee " + accountsFile, function(error, output){
-				if(error){
-					console.log(error);
-				}
-				console.log(output);
-				console.log("Generated accounts file.");
-
-			});
-			*/
+		*/
+		/*
+		process("/scripts/rly-cutter.sh " + options.accounts_file + " " + options.account_id + " 250 | sudo tee " + accountsFile, function(error, output){
+			if(error){
+				console.log(error);
+			}
+			console.log(output);
+			console.log("Generated accounts file.");
 
 		});
+		*/
+
 	});
+	//});
 
 	
 
@@ -304,7 +305,7 @@ Program
 	.option("-r, --accounts_file <value>", "Account File")
 	.option("-s, --sender_domains <value>", "Sender domains. Example: mails.com,google.com,china.com", parseSenderDomains)
 	.option("-w, --wait_time <value>", "Wait time in minutes.")
-	.option("-b, --bitly_domain <value>", "Bitly redirect domain")
+	//.option("-b, --bitly_domain <value>", "Bitly redirect domain")
 	.action(function(options){
 		buildSend(options, 0);
 	});

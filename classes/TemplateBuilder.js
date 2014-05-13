@@ -57,8 +57,8 @@ TemplateBuilder.shortenFromDomain = function(fromDomain){
 	return shortFromDomain;
 }
 
-TemplateBuilder.build = function(template, domain, bitlyDomain){
-	if(bitlyDomain == undefined){ bitlyDomain = ""; }
+TemplateBuilder.build = function(template, domain){
+	//if(bitlyDomain == undefined){ bitlyDomain = ""; }
 	/*
 	' _ space.repeat(tt.number(3,12)) _ '
 	*/
@@ -68,7 +68,7 @@ TemplateBuilder.build = function(template, domain, bitlyDomain){
 
 	template = template.replace(/\[\!\#domain\#\!\]/g, domain);
 	template = template.replace(/\[\!\#domain_fragments\#\!\]/g, TemplateBuilder.domainToFragments(domain));
-	template = template.replace(/\[\!\#bitly_domain\#\!\]/g, bitlyDomain);
+	//template = template.replace(/\[\!\#bitly_domain\#\!\]/g, bitlyDomain);
 
 	return template;
 }
